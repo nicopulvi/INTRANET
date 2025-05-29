@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Alumno</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --nav-color: #8bc34a;
+      --accent-color: #00897b;
+      --font-family: 'Roboto', sans-serif;
+      --bg-light: #f5f5f5;
+      --card-bg: #fff;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+      --heading-color: #444;
+      --even-row: #fafafa;
+      --hover-row: #e0f2f1;
+      --att-good: #4caf50;
+      --att-medium: #ffeb3b;
+      --att-low: #f44336;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-light);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+    .navbar { background: var(--nav-color); color: #fff; padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .navbar img { height: 50px; }
+    .navbar a { color: #fff; text-decoration: none; font-size: 0.95rem; margin-left: 1.5rem; transition: opacity 0.2s; }
+    .navbar a:hover { opacity: 0.8; }
+
+    main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    .user-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .user-info-left h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .user-info-left p { font-size: 1rem; margin-bottom: 0.75rem; }
+    .user-info-left a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
+    .user-info-right { text-align: right; font-size: 0.9rem; }
+    .user-info-right p, .user-info-right a { margin-bottom: 0.5rem; display: block; }
+    .user-info-right a:hover { text-decoration: underline; }
+    hr.separator { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
+    h2.section-title { font-size: 1.5rem; text-align: center; text-decoration: underline; margin-bottom: 1rem; color: var(--heading-color); }
+    .card { background: var(--card-bg); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    details { border-bottom: 1px solid var(--border-color); }
+    details:last-of-type { border-bottom: none; }
+    summary { list-style: none; background: var(--card-bg); padding: 1rem 1.5rem; cursor: pointer; font-weight: 500; display: flex; align-items: center; transition: background 0.2s; }
+    summary:hover { background: var(--even-row); }
+    details[open] summary { background: #eceff1; }
+    summary img { width: 20px; margin-right: 0.75rem; }
+    .content { padding: 1rem 1.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+    th, td { padding: 0.75rem; border: 1px solid var(--border-color); text-align: left; font-size: 0.9rem; }
+    th { background: var(--even-row); font-weight: 500; }
+    tbody tr:nth-child(even) { background: var(--even-row); }
+    tbody tr:hover { background: var(--hover-row); }
+    .pct { font-weight: 500; }
+    .pct.good { color: var(--att-good); }
+    .pct.mid { color: var(--att-medium); }
+    .pct.low { color: var(--att-low); }
+    .dual-tables { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .table-wrapper { flex: 1 1 45%; }
+    .table-wrapper h3 { margin-bottom: 0.5rem; color: var(--heading-color); }
+    .stats { display: flex; width: 100%; margin-top: 2rem; border-radius: 6px; overflow: hidden; }
+    .stats .stat { flex: 1; text-align: center; padding: 1.5rem; font-size: 1.25rem; font-weight: 500; }
+    .stats .stat:nth-child(1) { background: #000; color: #fff; }
+    .stats .stat:nth-child(2) { background: #e8f5e9; color: #000; }
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-responsive table { min-width: 800px; }
+  </style>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabase = createClient(
+      'https://tgkwcwjtpqludmyalbqc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRna3djd2p0cHFsdWRteWFsYnFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODI2NzEyMCwiZXhwIjoyMDYzODQzMTIwfQ.BZlf2xHwIPVBPh2vjYSJxwgkkiOySifv2N0AnScVVog'
+    );
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const siu = localStorage.getItem('siu');
+      if (!siu) {
+        alert('No has iniciado sesión');
+        window.location.href = '/login.html';
+        return;
+      }
+      // Alumno
+      const { data: alumno, error: alumnoError } = await supabase
+        .from('alumnos').select('*').eq('siu', siu).single();
+      if (alumnoError || !alumno) return alert(`Alumno con SIU ${siu} no encontrado`);
+      document.querySelector('.user-info-left h1').textContent = `${alumno.nombre} ${alumno.apellido}`;
+      document.querySelector('.user-info-left p').textContent = `Usuario: ${alumno.siu}`;
+      document.querySelector('.user-info-right').innerHTML = `
+        <p>E-Mail: ${alumno.email}</p>
+        <p>Fecha: ${new Date().toLocaleDateString()}</p>
+        <a href="faq.html">FAQ y documentos de ayuda</a>
+      `;
+      const alumnoId = alumno.id;
+
+      // Catálogos
+      const { data: materiasCatalog } = await supabase.from('materias').select('*');
+      const { data: carrerasCatalog } = await supabase.from('carreras').select('*');
+      const materiasMap = Object.fromEntries(materiasCatalog.map(m => [m.codigo, m.nombre]));
+      const carrerasMap = Object.fromEntries(carrerasCatalog.map(c => [c.codigo, c.nombre]));
+
+      // Planilla de notas
+      const { data: realizadas } = await supabase.from('materias_realizadas')
+        .select('*').eq('alumno_id', alumnoId);
+      const planBody = document.querySelectorAll('details')[0].querySelector('tbody');
+      planBody.innerHTML = '';
+      realizadas.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><a >${materiasMap[r.materia_codigo]||r.materia_codigo}</a></td>
+          <td>${r.nota}</td>
+          <td>${r.materia_codigo}</td>
+          <td class="pct ${(r.asistencia>=75?'good':r.asistencia>=50?'mid':'low')}">${r.asistencia}</td>
+          <td>${r.cohorte}</td>
+          <td>${r.bimestre}</td>
+          <td>${carrerasMap[r.codigo_carrera]||r.codigo_carrera}</td>
+        `;
+        planBody.appendChild(tr);
+      });
+
+      // Materias cursando
+      const { data: cursando } = await supabase.from('materias_cursando')
+        .select('*').eq('alumno_id', alumnoId);
+      const curBody = document.querySelectorAll('details')[1].querySelector('tbody');
+      curBody.innerHTML = '';
+      cursando.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${materiasMap[c.materia_codigo]||c.materia_codigo}</td><td>${carrerasMap[c.codigo_carrera]||c.codigo_carrera}</td>`;
+        curBody.appendChild(tr);
+      });
+
+      const { data: carrerasAlumno } = await supabase.from('alumnos_carreras')
+          .select('*').eq('alumno_id', alumnoId);
+      const card = document.querySelector('.card');
+      carrerasAlumno.forEach(carr => {
+      const codigoCarr = carr.codigo_carrera;
+      const nombreCarr = carrerasMap[codigoCarr] || codigoCarr;
+
+      //Todas las materias de esta carrera 
+      const materiasDeCarrera = materiasCatalog.filter(m => m.codigo_carrera === codigoCarr);
+
+      //Materias ya hechas y aprobadas originalmente en esta carrera 
+      let hechas = realizadas
+        .filter(r => r.codigo_carrera === codigoCarr)
+        .filter(r => {
+          const notaNum = Number(r.nota);
+          return !isNaN(notaNum) && notaNum >= 4;
+        })
+        .map(r => r.materia_codigo);
+
+
+      // ————————————————
+      // LÓGICA DE OPTATIVAS
+
+      //Contar cuántas materias hizo el alumno en otras carreras
+      const otrasRealizadasCount = realizadas
+        .filter(r => r.codigo_carrera !== codigoCarr)
+        .length;
+
+      //Listar las "Optativa" definidas en el plan de esta carrera
+      const optativasCatalog = materiasDeCarrera
+        .filter(m => m.nombre.trim().toLowerCase() === 'optativa');
+
+      //Marcar tantas optativas como materias hechas en otras carreras
+      const numOptativasParaMarcar = Math.min(otrasRealizadasCount, optativasCatalog.length);
+      for (let i = 0; i < numOptativasParaMarcar; i++) {
+        const codigoOpt = optativasCatalog[i].codigo;
+        if (!hechas.includes(codigoOpt)) {
+          hechas.push(codigoOpt);
+        }
+      }
+      // ————————————————
+
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      const img = document.createElement('img');
+      img.src = 'img/cloud-icon.svg';
+      img.alt = '';
+      summary.appendChild(img);
+      summary.appendChild(document.createTextNode(nombreCarr));
+      details.appendChild(summary);
+
+      const content = document.createElement('div');
+      content.classList.add('content', 'dual-tables');
+
+      ['Realizadas', 'Faltantes'].forEach(tipo => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('table-wrapper');
+
+        const h3 = document.createElement('h3');
+        h3.textContent = `Materias ${tipo}`;
+        wrapper.appendChild(h3);
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr><th>Código</th><th>Materia</th></tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+
+        materiasDeCarrera
+          .filter(m => (tipo === 'Realizadas') === hechas.includes(m.codigo))
+          .forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${m.codigo}</td><td>${m.nombre}</td>`;
+            tbody.appendChild(tr);
+          });
+
+        wrapper.appendChild(table);
+        content.appendChild(wrapper);
+      });
+
+      details.appendChild(content);
+      card.appendChild(details);
+    });
+
+
+      // Estadísticas de aplazos
+      //realizadas.forEach(r => {
+        //if (typeof r.nota === 'string' && r.nota.includes('Apl.')) {
+          // suma un aplazo a la carrera de esa nota
+          //aplazosPorCarrera[r.codigo_carrera] = (aplazosPorCarrera[r.codigo_carrera] || 0) + 1;
+        //}
+      //});
+      //const aplazosText = Object.entries(aplazosPorCarrera)
+      //  .map(([codCarr, cnt]) => `${carrerasMap[codCarr]||codCarr}: ${cnt}`)
+      //  .join(' ');
+      //document.querySelector('.stats .stat:nth-child(1)').innerText =
+      //  `Aplazos:\n${aplazosText || '0'}`;
+    });
+  </script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="left"><img src="img/logo.png" alt="Logo LSE"></div>
+    <div class="right">
+      <a href="#">Cambiar contraseña</a>
+      <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+    </div>
+  </header>
+  <main>
+    <div class="user-header">
+      <div class="user-info-left">
+        <h1>Nombre</h1>
+        <p>Usuario: SIU</p>
+      </div>
+      <div class="user-info-right">
+        <p>E-Mail: mail@gmail.com</p>
+        <p>Fecha: fecha</p>
+        <a href="faq.html">FAQ y documentos de ayuda</a>
+      </div>
+    </div>
+    <hr class="separator">
+    <h2 class="section-title">Historial académico</h2>
+
+    <div class="card">
+      <details>
+        <summary><img src="img/cloud-icon.svg" alt="">Planilla de notas</summary>
+        <div class="content table-responsive">
+          <table>
+            <thead>
+              <tr><th>Materia</th><th>Nota</th><th>Cod.</th><th>% Asist</th><th>Cohorte</th><th>Bimestre</th><th>Carrera</th></tr>
+            </thead>
+            <tbody><!-- dinámico --></tbody>
+          </table>
+        </div>
+      </details>
+      <details>
+        <summary><img src="img/cloud-icon.svg" alt="">Materias en las cuales se encuentra inscripto de este bimestre</summary>
+        <div class="content">
+          <table>
+            <thead><tr><th>Materia</th><th>Carrera</th></tr></thead>
+            <tbody><!-- dinámico --></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div class="stats">
+      <div class="stat">Aplazos:<br>0</div>
+      <div class="stat">Estado de cuotas:<br>Al día</div>
+    </div>
+  </main>
+
+  <script>
+    function cerrarSesion(params) {
+      localStorage.removeItem('siu');
+      window.location.href= "login.html"
+    }
+  </script>
+</body>
+</html>

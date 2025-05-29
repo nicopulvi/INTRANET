@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documentos de Ayuda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --nav-color: #8bc34a;
+      --accent-color: #00897b;
+      --font-family: 'Roboto', sans-serif;
+      --bg-light: #f5f5f5;
+      --card-bg: #fff;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+      --heading-color: #444;
+      --even-row: #fafafa;
+      --hover-row: #e0f2f1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-light);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+    .navbar {
+      background: var(--nav-color);
+      color: #fff;
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar img { height: 50px; }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      margin-left: 1.5rem;
+      transition: opacity 0.2s;
+      cursor: pointer;
+    }
+    .navbar a:hover { opacity: 0.8; }
+
+    main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1.section-title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--heading-color);
+      border-bottom: 2px solid var(--nav-color);
+      padding-bottom: 0.25rem;
+    }
+    h2.subsection-title {
+      font-size: 1.5rem;
+      margin: 1.5rem 0 1rem;
+      color: var(--heading-color);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.25rem;
+    }
+
+    /* FAQ */
+    .card {
+      background: var(--card-bg);
+      border-radius: 6px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 1rem 1.5rem;
+    }
+    details {
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 0.5rem;
+    }
+    details:last-of-type {
+      border-bottom: none;
+    }
+    summary {
+      list-style: none;
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+      font-size: 1.1rem;
+    }
+    summary:hover {
+      background: var(--even-row);
+    }
+    details[open] summary {
+      background: #eceff1;
+    }
+    summary img {
+      width: 20px;
+      margin-right: 0.75rem;
+    }
+    .content {
+      padding: 1rem 1.5rem 1.5rem;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Documentos lista */
+    .doc-list {
+      margin: 0 auto;
+    }
+    .doc-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      font-size: 1rem;
+      color: var(--text-color);
+    }
+    .doc-item:hover {
+      background: var(--hover-row);
+    }
+    .doc-item img {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    /* Modal styles */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    .modal-bg.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      max-width: 90vw;
+      width: 900px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 70%;
+    }
+    .modal-header {
+      background: var(--nav-color);
+      color: white;
+      padding: 0.75rem 1rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-body {
+      flex: 1;
+      background: #fff;
+    }
+    .modal-body embed {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="left"><img src="img/logo.png" alt="Logo LSE" /></div>
+    <div class="right">
+      <a href="#">Cambiar contraseña</a>
+      <a onclick="cerrarSesion()">Cerrar sesión</a>
+    </div>
+  </header>
+  <main>
+    <div style="text-align: center; margin-top: 0.2rem;">
+        <button onclick="location.href='dashboard.html'" 
+                style="background: var(--nav-color); color: white; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 6px; cursor: pointer; transition: background-color 0.2s;">
+            Volver
+        </button>
+    </div>
+    <h1 class="section-title">Documentos de Ayuda</h1>
+
+    <section>
+      <h2 class="subsection-title">Preguntas Frecuentes (FAQ)</h2>
+      <div class="card">
+        <details>
+          <summary><img src="img/cloud-icon.svg" alt="">¿Cómo puedo cambiar mi contraseña?</summary>
+          <div class="content">
+            Para cambiar tu contraseña, haz clic en el enlace "Cambiar contraseña" en la parte superior derecha de la página y sigue las instrucciones.
+          </div>
+        </details>
+        <details>
+          <summary><img src="img/cloud-icon.svg" alt="">¿Dónde puedo consultar mis notas?</summary>
+          <div class="content">
+            Tus notas están disponibles en la sección "Historial académico" en tu panel de alumno. Ahí podrás ver las materias que aprobaste y las calificaciones.
+          </div>
+        </details>
+        <details>
+          <summary><img src="img/cloud-icon.svg" alt="">¿Como cambio el mail de mi cuenta?</summary>
+          <div class="content">
+            Deberas comunicarte con nosotros via mail.
+          </div>
+        </details>
+        <details>
+          <summary><img src="img/cloud-icon.svg" alt="">¿Qué hacer si encuentro un error en mis notas?</summary>
+          <div class="content">
+            Comunicate con nosotros y comentanos que notas estan mal cargadas.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="subsection-title">Tutoriales y Documentos</h2>
+      <div class="doc-list">
+        <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vSnz6IZUoPcQNMxtTtCEUAwuzzAD6LOAuaPQCFQkFtttTLIx3pUaB-murNEn4OWnzMdh0Wd-gsK-G7m/pub" data-title="Materias Optativas">
+          <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+          Materias Optativas
+        </div>
+        <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vTTSzbJ-jWw1J78AlABDVX0oIV1H8LGrYFBlf8piEQuEIV_pES0JcNASVmXmlrsGDiZMYAT1a30cBFT/pub" data-title="Definición de Trabajo Final">
+          <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+          Definición de Trabajo Final
+        </div>
+        <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vR0qV4cT7AURNN8RuWe-ciGodtwYyhcCVAK_XsWs_nEB42UfQdrK1XepaNvVDx0EdnHfbZXSJVOcNSs/pub" data-title="Info Trabajo Final">
+          <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+          Info Trabajo Final
+        </div>
+        <div class="doc-item" data-pdf="https://drive.google.com/file/d/1uzXcYIoUF06HgtIwZAvskYXov9Y3gFW4/preview" data-title="Instructivo para alumnos de maestría">
+          <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+          Instructivo para alumnos de maestría
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-bg" id="pdfModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">Título PDF</span>
+        <button class="modal-close" aria-label="Cerrar modal">&times;</button>
+      </div>
+        <div class="modal-body">
+        <iframe src="" id="modalPdfEmbed" style="width:100%; height:100%; border:none;"></iframe>
+        </div>
+
+    </div>
+  </div>
+
+    <script>
+    function cerrarSesion() {
+        localStorage.removeItem('siu');
+            window.location.href = "login.html";
+    }
+
+    const docItems = document.querySelectorAll('.doc-item');
+    const modal = document.getElementById('pdfModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPdfEmbed = document.getElementById('modalPdfEmbed');
+    const modalCloseBtn = modal.querySelector('.modal-close');
+
+    docItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const pdfSrc = item.getAttribute('data-pdf');
+        const title = item.getAttribute('data-title');
+        modalTitle.textContent = title;
+        modalPdfEmbed.setAttribute('src', pdfSrc);
+        modal.classList.add('active');
+        modal.focus();
+    });
+    });
+
+    modalCloseBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    modalPdfEmbed.setAttribute('src', '');
+    });
+
+    modal.addEventListener('click', e => {
+    if (e.target === modal) {
+        modal.classList.remove('active');
+        modalPdfEmbed.setAttribute('src', '');
+    }
+    });
+
+    document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+        modal.classList.remove('active');
+        modalPdfEmbed.setAttribute('src', '');
+    }
+    });
+
+    </script>
+</body>
+</html>
