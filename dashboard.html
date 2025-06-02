@@ -5,71 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Alumno</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --nav-color: #8bc34a;
-      --accent-color: #00897b;
-      --font-family: 'Roboto', sans-serif;
-      --bg-light: #f5f5f5;
-      --card-bg: #fff;
-      --text-color: #333;
-      --border-color: #e0e0e0;
-      --heading-color: #444;
-      --even-row: #fafafa;
-      --hover-row: #e0f2f1;
-      --att-good: #4caf50;
-      --att-medium: #ffeb3b;
-      --att-low: #f44336;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: var(--font-family);
-      background: var(--bg-light);
-      color: var(--text-color);
-      min-height: 100vh;
-    }
-    .navbar { background: var(--nav-color); color: #fff; padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .navbar img { height: 50px; }
-    .navbar a { color: #fff; text-decoration: none; font-size: 0.95rem; margin-left: 1.5rem; transition: opacity 0.2s; }
-    .navbar a:hover { opacity: 0.8; }
-
-    main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-    .user-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-    .user-info-left h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-    .user-info-left p { font-size: 1rem; margin-bottom: 0.75rem; }
-    .user-info-left a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
-    .user-info-right { text-align: right; font-size: 0.9rem; }
-    .user-info-right p, .user-info-right a { margin-bottom: 0.5rem; display: block; }
-    .user-info-right a:hover { text-decoration: underline; }
-    hr.separator { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
-    h2.section-title { font-size: 1.5rem; text-align: center; text-decoration: underline; margin-bottom: 1rem; color: var(--heading-color); }
-    .card { background: var(--card-bg); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    details { border-bottom: 1px solid var(--border-color); }
-    details:last-of-type { border-bottom: none; }
-    summary { list-style: none; background: var(--card-bg); padding: 1rem 1.5rem; cursor: pointer; font-weight: 500; display: flex; align-items: center; transition: background 0.2s; }
-    summary:hover { background: var(--even-row); }
-    details[open] summary { background: #eceff1; }
-    summary img { width: 20px; margin-right: 0.75rem; }
-    .content { padding: 1rem 1.5rem; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
-    th, td { padding: 0.75rem; border: 1px solid var(--border-color); text-align: left; font-size: 0.9rem; }
-    th { background: var(--even-row); font-weight: 500; }
-    tbody tr:nth-child(even) { background: var(--even-row); }
-    tbody tr:hover { background: var(--hover-row); }
-    .pct { font-weight: 500; }
-    .pct.good { color: var(--att-good); }
-    .pct.mid { color: var(--att-medium); }
-    .pct.low { color: var(--att-low); }
-    .dual-tables { display: flex; gap: 2rem; flex-wrap: wrap; }
-    .table-wrapper { flex: 1 1 45%; }
-    .table-wrapper h3 { margin-bottom: 0.5rem; color: var(--heading-color); }
-    .stats { display: flex; width: 100%; margin-top: 2rem; border-radius: 6px; overflow: hidden; }
-    .stats .stat { flex: 1; text-align: center; padding: 1.5rem; font-size: 1.25rem; font-weight: 500; }
-    .stats .stat:nth-child(1) { background: #000; color: #fff; }
-    .stats .stat:nth-child(2) { background: #e8f5e9; color: #000; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .table-responsive table { min-width: 800px; }
-  </style>
+  <link rel="stylesheet" href="styleDashboard.css">
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient(
@@ -245,11 +181,33 @@
       <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
     </div>
   </header>
+
+  <!-- popup para datos del certificado -->
+  <div id="certModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h2>Generar Certificado</h2>
+      <form id="certForm">
+        <label>Nombre:</label>
+        <input type="text" id="certNombre" required><br>
+        <label>DNI:</label>
+        <input type="text" id="certDni" required><br>
+        <label>Carrera:</label>
+        <input type="text" id="certCarrera" required><br>
+        <label>Cohorte:</label>
+        <input type="text" id="certCohorte" required><br>
+        <button type="submit">Generar PDF</button>
+      </form>
+    </div>
+  </div>
+
   <main>
     <div class="user-header">
       <div class="user-info-left">
         <h1>Nombre</h1>
         <p>Usuario: SIU</p>
+        <a style="cursor: pointer;" onclick="generar()">Generar certificado</a>
+        <a href="cargaCV.html" >Cargar CV</a>
       </div>
       <div class="user-info-right">
         <p>E-Mail: mail@gmail.com</p>
@@ -294,6 +252,65 @@
       localStorage.removeItem('siu');
       window.location.href= "login.html"
     }
-  </script>
+    function generar() {
+      document.getElementById('certModal').style.display = 'block';
+    }
+
+    function cerrarModal() {
+      document.getElementById('certModal').style.display = 'none';
+    }
+
+    document.getElementById('certForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      //deshabilitar boton
+      const closeBtn = document.querySelector('.close');
+      closeBtn.style.pointerEvents = 'none';
+      closeBtn.style.opacity = '0.5';
+      closeBtn.style.cursor = 'not-allowed';
+
+      const generarBtn = document.querySelector('#certForm button[type="submit"]');
+      generarBtn.disabled = true;
+      generarBtn.style.opacity = '0.5';
+      generarBtn.style.cursor = 'not-allowed';
+
+
+      const nombre = document.getElementById('certNombre').value;
+      const dni = document.getElementById('certDni').value;
+      const carrera = document.getElementById('certCarrera').value;
+      const cohorte = document.getElementById('certCohorte').value;
+
+      const params = new URLSearchParams({ nombre, dni, carrera, cohorte });
+
+      const url = `https://script.google.com/macros/s/AKfycbxeWIRGLzM4ox9UPAtYxSCtzON5e2oArOX_Ii3Uc0icnO4BkvUP2cwpCIN2UkrqiBfm/exec?${params.toString()}`;
+
+      try {
+        const respuesta = await fetch(url);
+        const resultado = await respuesta.json();
+
+        const link = document.createElement('a');
+        link.href = resultado.url;
+        link.download = "certificado.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        alert("Error al generar el certificado. Intenta nuevamente.");
+        console.error(error);
+      }
+      cerrarModal();
+      //habilitar boton
+      closeBtn.style.pointerEvents = 'auto';
+      closeBtn.style.opacity = '1';
+      closeBtn.style.cursor = 'pointer';
+
+      generarBtn.disabled = false;
+      generarBtn.style.opacity = '1';
+      generarBtn.style.cursor = 'pointer';
+
+    });
+
+
+</script>
 </body>
 </html>
