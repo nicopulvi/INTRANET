@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Restablecer contraseña - Laboratorio de Sistemas Embebidos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styleDashboard.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="left">
+      <a href="dashboard.html"><img src="img/logo.png" alt="Logo LSE" /></a>
+    </div>
+    <div class="right">
+      <a href="login.html">Iniciar sesión</a>
+    </div>
+  </header>
+
+  <main style="max-width: 400px; margin: 40px auto; font-family: 'Roboto', sans-serif;">
+    <h2>Restablecer contraseña</h2>
+    <p>Ingrese su nueva contraseña.</p>
+    <form id="resetForm">
+      <label for="newPassword">Nueva contraseña:</label><br />
+      <input type="password" id="newPassword" required minlength="6" /><br /><br />
+      <label for="confirmPassword">Confirmar contraseña:</label><br />
+      <input type="password" id="confirmPassword" required minlength="6" /><br /><br />
+      <button type="submit">Actualizar contraseña</button>
+    </form>
+    <p id="message" style="margin-top:20px; font-weight: 600;"></p>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      'https://tgkwcwjtpqludmyalbqc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRna3djd2p0cHFsdWRteWFsYnFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODI2NzEyMCwiZXhwIjoyMDYzODQzMTIwfQ.BZlf2xHwIPVBPh2vjYSJxwgkkiOySifv2N0AnScVVog'
+    );
+
+    const urlParams = new URLSearchParams(window.location.search);
+    // Supabase pasa el token como "access_token" en la URL después del #
+    let token = null;
+
+    // Intenta leer token de hash (#access_token=...)
+    if (window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      token = hashParams.get('access_token');
+    }
+
+    const messageEl = document.getElementById('message');
+    const form = document.getElementById('resetForm');
+
+    if (!token) {
+      messageEl.style.color = 'red';
+      messageEl.textContent = 'Token inválido o faltante en la URL.';
+      form.style.display = 'none';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'Las contraseñas no coinciden.';
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        return;
+      }
+
+      messageEl.style.color = 'black';
+      messageEl.textContent = 'Actualizando contraseña...';
+
+      try {
+        const { data, error } = await supabase.auth.updateUser({
+          password: newPassword
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (error) {
+          messageEl.style.color = 'red';
+          messageEl.textContent = 'Error al actualizar la contraseña: ' + error.message;
+          return;
+        }
+
+        messageEl.style.color = 'green';
+        messageEl.textContent = 'Contraseña actualizada correctamente. Puede <a href="login.html">iniciar sesión</a> ahora.';
+        form.reset();
+        form.style.display = 'none';
+      } catch (err) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'Error inesperado: ' + err.message;
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

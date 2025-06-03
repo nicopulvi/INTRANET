@@ -178,6 +178,51 @@
         window.location.href = 'login.html';
       });
 
+
+        // Modal cambiar contraseña
+        const changePassBtn = document.getElementById('change-pass-btn');
+        const changePassModal = document.getElementById('changePassModal');
+        const changePassForm = document.getElementById('changePassForm');
+        const cancelChangePass = document.getElementById('cancelChangePass');
+
+        changePassBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          changePassModal.style.display = 'flex';
+        });
+
+        cancelChangePass.addEventListener('click', () => {
+          changePassModal.style.display = 'none';
+          changePassForm.reset();
+        });
+
+        changePassForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const newPass = document.getElementById('newPass').value;
+          const confirmPass = document.getElementById('confirmPass').value;
+
+          if (newPass !== confirmPass) {
+            alert('Las contraseñas no coinciden.');
+            return;
+          }
+
+          try {
+            const { data, error } = await supabase.auth.updateUser({ password: newPass });
+            if (error) {
+              alert('Error al actualizar la contraseña: ' + error.message);
+              return;
+            }
+            alert('Contraseña actualizada correctamente.');
+            changePassModal.style.display = 'none';
+            changePassForm.reset();
+          } catch (error) {
+            alert('Error inesperado al actualizar la contraseña.');
+            console.error(error);
+          }
+        });
+
+
+
 }
 
 
@@ -201,7 +246,7 @@
   <header class="navbar">
     <div class="left"><img src="img/logo.png" alt="Logo LSE"></div>
     <div class="right">
-      <a href="#">Cambiar contraseña</a>
+      <a href="#" id="change-pass-btn">Cambiar contraseña</a>
       <a href="#" id="logout-btn">Cerrar sesión</a>
     </div>
   </header>
@@ -225,6 +270,21 @@
     </div>
   </div>
 
+  <!-- popup para cambiar contrasña -->
+  <div id="changePassModal" class="modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:20px; border-radius:5px; max-width:400px; width:90%;">
+      <h2>Cambiar contraseña</h2>
+      <form id="changePassForm">
+        <label for="newPass">Nueva contraseña:</label><br>
+        <input type="password" id="newPass" required minlength="6" /><br><br>
+        <label for="confirmPass">Confirmar contraseña:</label><br>
+        <input type="password" id="confirmPass" required minlength="6" /><br><br>
+        <button type="submit">Actualizar contraseña</button>
+        <button type="button" id="cancelChangePass" style="margin-left:10px;">Cancelar</button>
+      </form>
+    </div>
+  </div>
+  
   <main>
     <div class="user-header">
       <div class="user-info-left">

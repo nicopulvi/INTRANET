@@ -96,6 +96,7 @@
 
       // Enviar email para recuperar contraseña
       const { data: resetData, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: 'http://127.0.0.1:5500/INTRANET/cambiarContrase%C3%B1a.html' //camboar cuando tenamos link verdadero
       });
 
       if (resetError) {
