@@ -34,10 +34,10 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const supabase = createClient(
-      'https://tgkwcwjtpqludmyalbqc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRna3djd2p0cHFsdWRteWFsYnFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODI2NzEyMCwiZXhwIjoyMDYzODQzMTIwfQ.BZlf2xHwIPVBPh2vjYSJxwgkkiOySifv2N0AnScVVog'
-    );
+    import { url, len } from "./leng.js";
+
+    const supabase = createClient(url, len);
+
 
     // Login
     document.getElementById("login-form").addEventListener("submit", async (e) => {

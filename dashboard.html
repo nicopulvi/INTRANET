@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="styleDashboard.css">
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    const supabase = createClient(
-      'https://tgkwcwjtpqludmyalbqc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRna3djd2p0cHFsdWRteWFsYnFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODI2NzEyMCwiZXhwIjoyMDYzODQzMTIwfQ.BZlf2xHwIPVBPh2vjYSJxwgkkiOySifv2N0AnScVVog'
-    );
+     import { url, len } from "./leng.js";
+
+    const supabase = createClient(url, len);
+
 
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
@@ -31,9 +31,18 @@
 
         if (alumnoError) {
           alert("Alumno no encontrado");
+          window.location.href = "login.html"
           return;
         }
         const siu = alumno.siu;
+        const fullName = alumno.nombre + " " + alumno.apellido
+
+        //llamar a appscript para ver si es deudor 
+        fetch("https://script.google.com/macros/s/AKfycbyJMLale2y9w2E_J4v7X1A__7AYefjkkjiqVT7yYu0MSWl0Vj0Q2VK2BGsprs5UNvRg/exec?fullName="+fullName)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById("estado").innerHTML = data.estado // "Deudor" o "Al dia"
+          });
 
       document.querySelector('.user-info-left h1').textContent = `${alumno.nombre} ${alumno.apellido}`;
       document.querySelector('.user-info-left p').textContent = `Usuario: ${alumno.siu}`;
@@ -327,10 +336,12 @@
     </div>
 
     <div class="stats">
-      <div class="stat">Aplazos:<br>0</div>
-      <div class="stat">Estado de cuotas:<br>Al día</div>
+      <div class="stat">Aplazos:<br></div>
+      <div class="stat">Estado de cuotas:<br><a id="estado"></a></div>
     </div>
   </main>
+
+  
 
   <script>
  
