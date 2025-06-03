@@ -15,16 +15,26 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
-      const siu = localStorage.getItem('siu');
-      if (!siu) {
-        alert('No has iniciado sesión');
-        window.location.href = '/login.html';
-        return;
-      }
-      // Alumno
-      const { data: alumno, error: alumnoError } = await supabase
-        .from('alumnos').select('*').eq('siu', siu).single();
-      if (alumnoError || !alumno) return alert(`Alumno con SIU ${siu} no encontrado`);
+      const sessionResponse = await supabase.auth.getSession();
+      const session = sessionResponse.data.session;
+
+      if (!session) {
+        window.location.href = "login.html";
+      } else {
+        const userEmail = session.user.email;
+        // Buscar SIU según email en tabla 'alumnos'
+        const { data: alumno, error: alumnoError } = await supabase
+          .from('alumnos')
+          .select('*')
+          .eq('email', userEmail)
+          .single();
+
+        if (alumnoError) {
+          alert("Alumno no encontrado");
+          return;
+        }
+        const siu = alumno.siu;
+
       document.querySelector('.user-info-left h1').textContent = `${alumno.nombre} ${alumno.apellido}`;
       document.querySelector('.user-info-left p').textContent = `Usuario: ${alumno.siu}`;
       document.querySelector('.user-info-right').innerHTML = `
@@ -158,6 +168,20 @@
     });
 
 
+    document.getElementById('logout-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          alert("Error al cerrar sesión");
+          return;
+        }
+        window.location.href = 'login.html';
+      });
+
+}
+
+
+
       // Estadísticas de aplazos
       //realizadas.forEach(r => {
         //if (typeof r.nota === 'string' && r.nota.includes('Apl.')) {
@@ -178,7 +202,7 @@
     <div class="left"><img src="img/logo.png" alt="Logo LSE"></div>
     <div class="right">
       <a href="#">Cambiar contraseña</a>
-      <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+      <a href="#" id="logout-btn">Cerrar sesión</a>
     </div>
   </header>
 
@@ -207,6 +231,7 @@
         <h1>Nombre</h1>
         <p>Usuario: SIU</p>
         <a style="cursor: pointer;" onclick="generar()">Generar certificado</a>
+        <br>
         <a href="cargaCV.html" >Cargar CV</a>
       </div>
       <div class="user-info-right">
@@ -248,10 +273,7 @@
   </main>
 
   <script>
-    function cerrarSesion(params) {
-      localStorage.removeItem('siu');
-      window.location.href= "login.html"
-    }
+ 
     function generar() {
       document.getElementById('certModal').style.display = 'block';
     }
