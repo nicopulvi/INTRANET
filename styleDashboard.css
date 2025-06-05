@@ -177,3 +177,51 @@
 #changePassModal button#cancelChangePass:hover {
   background-color: #bdbdbd;
 }
+  #loadingOverlay {
+    position: absolute;
+    top: 70px; /* altura del header */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+  }
+
+  .logo-container {
+    position: relative;
+    width: 150px;
+  }
+
+  .logo-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .logo-base {
+    opacity: 0.2;
+    filter: grayscale(100%);
+  }
+
+  .logo-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    clip-path: inset(0 100% 0 0); /* oculto al principio */
+    animation: fillLogo 2s ease-out forwards;
+  }
+
+  @keyframes fillLogo {
+    to {
+      clip-path: inset(0 0 0 0); /* muestra completo */
+    }
+  }
+
+  #loadingOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }

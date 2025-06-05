@@ -37,12 +37,7 @@
         const siu = alumno.siu;
         const fullName = alumno.nombre + " " + alumno.apellido
 
-        //llamar a appscript para ver si es deudor 
-        fetch("https://script.google.com/macros/s/AKfycbyJMLale2y9w2E_J4v7X1A__7AYefjkkjiqVT7yYu0MSWl0Vj0Q2VK2BGsprs5UNvRg/exec?fullName="+fullName)
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("estado").innerHTML = data.estado // "Deudor" o "Al dia"
-          });
+
 
       document.querySelector('.user-info-left h1').textContent = `${alumno.nombre} ${alumno.apellido}`;
       document.querySelector('.user-info-left p').textContent = `Usuario: ${alumno.siu}`;
@@ -52,6 +47,84 @@
         <a href="faq.html">FAQ y documentos de ayuda</a>
       `;
       const alumnoId = alumno.id;
+      // Buscar problemas del alumno
+      const { data: problemas, error: problemasError } = await supabase
+        .from('problemas')
+        .select('aplazos, es_deudor, encuestas_incompletas')
+        .eq('alumno_id', alumnoId)
+        .single();
+
+      if (!problemasError && problemas) {
+        const notificaciones = [];
+
+        // Aplazos: puede ser string o array
+        let aplazosArray = [];
+        if (Array.isArray(problemas.aplazos)) {
+          aplazosArray = problemas.aplazos;
+        } else if (typeof problemas.aplazos === 'string') {
+          aplazosArray = problemas.aplazos.split(',').map(e => e.trim());
+        }
+
+        const aplazosGraves = aplazosArray
+          .map(item => {
+            const partes = item.split(':');
+            if (partes.length === 2) {
+              const materia = partes[0].trim();
+              const cantidad = parseInt(partes[1].trim());
+              if (!isNaN(cantidad) && cantidad >= 3) {
+                return `${materia} (${cantidad} aplazos)`;
+              }
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        if (aplazosGraves.length > 0) {
+          notificaciones.push(`Materias con 3 o más aplazos: ${aplazosGraves.join(', ')}`);
+        }
+
+        // Deudor
+        if (problemas.es_deudor === true) {
+          notificaciones.push("Estás en condición de deudor.");
+        }
+
+        // Encuestas incompletas: puede ser string o array
+        let encuestas = [];
+        if (Array.isArray(problemas.encuestas_incompletas)) {
+          encuestas = problemas.encuestas_incompletas;
+        } else if (typeof problemas.encuestas_incompletas === 'string') {
+          encuestas = problemas.encuestas_incompletas.split(',').map(e => e.trim());
+        }
+
+        if (encuestas.length > 0) {
+          notificaciones.push(`Encuestas sin completar: ${encuestas.join(', ')}`);
+        }
+
+        // Mostrar notificaciones
+        if (notificaciones.length > 0) {
+          const notifBox = document.createElement('div');
+          notifBox.style.background = '#ffe0e0';
+          notifBox.style.color = '#900';
+          notifBox.style.padding = '10px';
+          notifBox.style.margin = '20px auto';
+          notifBox.style.border = '1px solid #f00';
+          notifBox.style.borderRadius = '5px';
+          notifBox.style.maxWidth = '600px';
+          notifBox.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>Centro de notificaciones:</strong>
+              <button style="background: none; border: none; color: #900; font-weight: bold; font-size: 18px; cursor: pointer;" id="closeNotifBtn">✕</button>
+            </div>
+            <ul style="padding-left: 20px; margin: 0;">${notificaciones.map(n => `<li>${n}</li>`).join('')}</ul>
+          `;
+
+        document.querySelector('main').prepend(notifBox);
+        document.querySelector('#closeNotifBtn').addEventListener('click', () => {
+  notifBox.remove();
+});
+
+        }
+      }
 
       // Catálogos
       const { data: materiasCatalog } = await supabase.from('materias').select('*');
@@ -235,6 +308,11 @@
 }
 
 
+// Ocultar overlay de carga
+document.getElementById('loadingOverlay').classList.add('hidden');
+setTimeout(() => {
+  document.getElementById('loadingOverlay').remove();
+}, 500); // Espera 0.5s por la transición antes de eliminarlo
 
       // Estadísticas de aplazos
       //realizadas.forEach(r => {
@@ -259,6 +337,14 @@
       <a href="#" id="logout-btn">Cerrar sesión</a>
     </div>
   </header>
+
+<div id="loadingOverlay">
+  <div class="logo-container">
+    <img src="img/logo.png" alt="Cargando..." class="logo-base" />
+    <img src="img/logo.png" alt="Cargando..." class="logo-fill" />
+  </div>
+</div>
+
 
   <!-- popup para datos del certificado -->
   <div id="certModal" class="modal" style="display:none;">
@@ -310,6 +396,7 @@
       </div>
     </div>
     <hr class="separator">
+    
     <h2 class="section-title">Historial académico</h2>
 
     <div class="card">
