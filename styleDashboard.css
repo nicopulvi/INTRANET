@@ -1,5 +1,5 @@
     :root {
-      --nav-color: #8bc34a;
+      --nav-color: #6da72b;
       --accent-color: #00897b;
       --font-family: 'Roboto', sans-serif;
       --bg-light: #f5f5f5;
@@ -179,7 +179,7 @@
 }
   #loadingOverlay {
     position: absolute;
-    top: 70px; /* altura del header */
+    top: 80px; /* altura del header */
     left: 0;
     width: 100%;
     height: calc(100% - 60px);

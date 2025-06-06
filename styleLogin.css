@@ -1,6 +1,6 @@
     :root {
-      --nav-color: #8bc34a;
-      --accent-color: #00897b;
+      --nav-color: #6da72b;
+      --accent-color: #47ad4a;
       --font-family: 'Roboto', sans-serif;
       --bg-light: #f5f5f5;
     }
@@ -11,6 +11,9 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.325), rgba(0, 0, 0, 0.199)), 
+    url(img/fondoFIUBA.jpg);
     }
     .navbar {
       background: var(--nav-color);
