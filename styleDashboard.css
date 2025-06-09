@@ -20,22 +20,130 @@
       color: var(--text-color);
       min-height: 100vh;
     }
-    .navbar { background: var(--nav-color); color: #fff; padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .navbar img { height: 50px; }
-    .navbar a { color: #fff; text-decoration: none; font-size: 0.95rem; margin-left: 1.5rem; transition: opacity 0.2s; }
-    .navbar a:hover { opacity: 0.8; }
+/* Sidebar a la izquierda */
+.navbar { 
+  background: var(--nav-color); 
+  color: #fff; 
+  padding: 1rem; 
+  width: 250px; /* Define el ancho del sidebar */
+  height: 100vh; /* Ocupa toda la altura de la pantalla */
+  position: fixed; /* Fija el sidebar */
+  left: 0; /* Se coloca a la izquierda */
+  top: 0; /* Empieza desde la parte superior */
+  display: flex;
+  flex-direction: column; /* Los elementos estarán alineados en columna */
+  align-items: flex-start; /* Los elementos se alinean a la izquierda */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para dar efecto visual */
+}
+
+.navbar img {
+  height: 30px;
+  width: 30px;
+}
+
+#navb {
+  width: 170px;
+  height: 60px;
+  margin-bottom: 4rem; /* Espacio debajo del logo */
+}
+
+.navbar a {
+  display: flex;
+  align-items: center; /* Alinea el icono con el texto */
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  margin-bottom: 1.5rem; /* Espacio entre los enlaces */
+  transition: opacity 0.2s;
+  padding-right: 20px;
+}
+
+.navbar a img {
+  margin-right: 10px; /* Espacio entre el icono y el texto */
+}
+
+.navbar a:hover {
+  opacity: 0.8;
+}
+
+
+/* Para que el contenido principal no quede debajo del sidebar */
+body {
+  margin-left: 250px; /* Desplazamos el contenido hacia la derecha */
+}
+
+.right {
+  display: none; /* Eliminamos el div de la derecha */
+}
 
     main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-    .user-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-    .user-info-left h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-    .user-info-left p { font-size: 1rem; margin-bottom: 0.75rem; }
-    .user-info-left a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
-    .user-info-right { text-align: right; font-size: 0.9rem; }
-    .user-info-left a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
-    .user-info-left a:hover { text-decoration: underline; }
-    .user-info-right a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
-    .user-info-right p, .user-info-right a { margin-bottom: 0.5rem; display: block; }
-    .user-info-right a:hover { text-decoration: underline; }
+.perfil {
+  background-color: var(--card-bg); /* Fondo blanco o color definido */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra para dar el efecto de card */
+  padding: 1.5rem; /* Espaciado interno */
+  margin-bottom: 1.5rem; /* Espaciado abajo de la card */
+}
+
+.user-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.user-info-left,
+.user-info-right {
+  flex: unset;
+  padding: 0;
+  width: 100%;
+  text-align: left; /* <-- Fuerza alineación a la izquierda */
+}
+.user-info-left h1 {
+  font-size: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.user-info-left p {
+  font-size: 1rem;
+  padding-bottom: 8px;
+
+}
+
+.user-info-left a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.user-info-left a:hover {
+  text-decoration: underline;
+  color: var(--accent-color-dark); /* Un color más oscuro cuando se pasa el ratón */
+}
+
+
+
+.user-info-right p,
+.user-info-right a {
+  display: block;
+  padding-bottom: 8px;
+
+}
+
+.user-info-right a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.user-info-right a:hover {
+  text-decoration: underline;
+  color: var(--accent-color-dark);
+}
     hr.separator { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
     h2.section-title { font-size: 1.5rem; text-align: center; text-decoration: underline; margin-bottom: 1rem; color: var(--heading-color); }
     .card { background: var(--card-bg); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -179,7 +287,8 @@
 }
   #loadingOverlay {
     position: absolute;
-    top: 80px; /* altura del header */
+    top: 0px;
+    height: 100%; 
     left: 0;
     width: 100%;
     height: calc(100% - 60px);
@@ -225,3 +334,20 @@
     opacity: 0;
     pointer-events: none;
   }
+
+.section-header {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  background-color: #d9d9d9;
+  margin: 0;
+
+  height: 95px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0px 1.5rem;
+
+  letter-spacing: 1px;
+}

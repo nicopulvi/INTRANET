@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Alumno</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stylefaq.css">
   <link rel="stylesheet" href="styleDashboard.css">
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -43,8 +44,8 @@
       document.querySelector('.user-info-left p').textContent = `Usuario: ${alumno.siu}`;
       document.querySelector('.user-info-right').innerHTML = `
         <p>E-Mail: ${alumno.email}</p>
+        <p id="carrerasTXT">Carreras en curso:</p>
         <p>Fecha: ${new Date().toLocaleDateString()}</p>
-        <a href="faq.html">FAQ y documentos de ayuda</a>
       `;
       const alumnoId = alumno.id;
       // Buscar problemas del alumno
@@ -80,7 +81,7 @@
           .filter(Boolean);
 
         if (aplazosGraves.length > 0) {
-          notificaciones.push(`Materias con 3 o más aplazos: ${aplazosGraves.join(', ')}`);
+          notificaciones.push(`Tenes con 3 o más aplazos: ${aplazosGraves.join(', ')}`);
         }
 
         // Deudor
@@ -165,10 +166,13 @@
       const { data: carrerasAlumno } = await supabase.from('alumnos_carreras')
           .select('*').eq('alumno_id', alumnoId);
       const card = document.querySelector('.card');
+      const carreras = [];
       carrerasAlumno.forEach(carr => {
       const codigoCarr = carr.codigo_carrera;
       const nombreCarr = carrerasMap[codigoCarr] || codigoCarr;
 
+      //rellenar perfil
+      carreras.push(nombreCarr)
       //Todas las materias de esta carrera 
       const materiasDeCarrera = materiasCatalog.filter(m => m.codigo_carrera === codigoCarr);
 
@@ -205,6 +209,9 @@
       // ————————————————
 
       const details = document.createElement('details');
+      details.classList.add( 'carreras'); 
+      details.style.display ="none" 
+      details.open = true;
       const summary = document.createElement('summary');
       const img = document.createElement('img');
       img.src = 'img/cloud-icon.svg';
@@ -247,7 +254,9 @@
 
       details.appendChild(content);
       card.appendChild(details);
+      
     });
+      document.getElementById("carrerasTXT").innerHTML = "Carreras en curso: "+carreras
 
 
     document.getElementById('logout-btn').addEventListener('click', async (e) => {
@@ -326,17 +335,39 @@ setTimeout(() => {
       //  .join(' ');
       //document.querySelector('.stats .stat:nth-child(1)').innerText =
       //  `Aplazos:\n${aplazosText || '0'}`;
+    
     });
+
   </script>
 </head>
 <body>
-  <header class="navbar">
-    <div class="left"><img src="img/logo2.png" alt="Logo LSE"></div>
-    <div class="right">
-      <a href="#" id="change-pass-btn">Cambiar contraseña</a>
-      <a href="#" id="logout-btn">Cerrar sesión</a>
-    </div>
-  </header>
+<header class="navbar">
+  <div class="left">
+    <img id="navb" src="img/logo2.png" alt="Logo LSE">
+  </div>
+  <a onclick="sidebar('Perfil')" href="#">
+    <img  src="img/logout.png"  alt="">Perfil
+  </a>
+  <a onclick="sidebar('Notas')" href="#">
+    <img  src="img/logout.png"  alt="">Notas
+  </a>
+  <a onclick="sidebar('Cursos')" href="#">
+    <img  src="img/logout.png"  alt="">Cursos
+  </a>
+  <a onclick="sidebar('Carreras')" href="#">
+    <img  src="img/logout.png"  alt="">Carrera
+  </a>
+  <a onclick="sidebar('Ayuda')" href="#">
+    <img  src="img/logout.png"  alt="">Ayuda
+  </a>
+  <a href="#" id="change-pass-btn">
+    <img src="img/logout.png"  alt="">Cambiar contraseña
+  </a>
+  <a href="#" id="logout-btn">
+    <img src="img/logout.png"  alt="">Cerrar Sesión
+  </a>
+</header>
+
 
 <div id="loadingOverlay">
   <div class="logo-container">
@@ -379,28 +410,26 @@ setTimeout(() => {
       </form>
     </div>
   </div>
-  
+  <div id="section-header" class="section-header">Perfil</div>
+
   <main>
-    <div class="user-header">
+    <div class="perfil user-header">
       <div class="user-info-left">
         <h1>Nombre</h1>
         <p>Usuario: SIU</p>
-        <a style="cursor: pointer;" onclick="generar()">Generar certificado</a>
-        <br>
         <!--<a href="cargaCV.html" >Cargar CV</a> -->
       </div>
       <div class="user-info-right">
         <p>E-Mail: mail@gmail.com</p>
+        <p id="carrerasTXT">Carreras en curso:</p>
         <p>Fecha: fecha</p>
-        <a href="faq.html">FAQ y documentos de ayuda</a>
       </div>
     </div>
-    <hr class="separator">
+
     
-    <h2 class="section-title">Historial académico</h2>
 
     <div class="card">
-      <details>
+      <details style="display: none;" class="notas" open>
         <summary><img src="img/cloud-icon.svg" alt="">Planilla de notas</summary>
         <div class="content table-responsive">
           <table>
@@ -411,7 +440,7 @@ setTimeout(() => {
           </table>
         </div>
       </details>
-      <details>
+      <details style="display: none;" class="cursos" open>
         <summary><img src="img/cloud-icon.svg" alt="">Materias en las cuales se encuentra inscripto de este bimestre</summary>
         <div class="content">
           <table>
@@ -428,6 +457,75 @@ setTimeout(() => {
     </div>
   -->
 
+    <div class="ayuda" style="display: none;">
+        <h2 class="subsection-title">Preguntas Frecuentes (FAQ)</h2>
+        <div class="card">
+          <details>
+            <summary><img src="img/cloud-icon.svg" alt="">¿Cómo puedo cambiar mi contraseña?</summary>
+            <div class="content">
+              Para cambiar tu contraseña, haz clic en el enlace "Cambiar contraseña" en la parte superior derecha de la página y sigue las instrucciones.
+            </div>
+          </details>
+          <details>
+            <summary><img src="img/cloud-icon.svg" alt="">¿Dónde puedo consultar mis notas?</summary>
+            <div class="content">
+              Tus notas están disponibles en la sección "Historial académico" en tu panel de alumno. Ahí podrás ver las materias que aprobaste y las calificaciones.
+            </div>
+          </details>
+          <details>
+            <summary><img src="img/cloud-icon.svg" alt="">¿Como cambio el mail de mi cuenta?</summary>
+            <div class="content">
+              Deberas comunicarte con nosotros via mail.
+            </div>
+          </details>
+          <details>
+            <summary><img src="img/cloud-icon.svg" alt="">¿Qué hacer si encuentro un error en mis notas?</summary>
+            <div class="content">
+              Comunicate con nosotros y comentanos que notas estan mal cargadas.
+            </div>
+          </details>
+        </div>
+      </section>
+      <section>
+        <h2 class="subsection-title">Tutoriales y Documentos</h2>
+        <div class="doc-list">
+          <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vSnz6IZUoPcQNMxtTtCEUAwuzzAD6LOAuaPQCFQkFtttTLIx3pUaB-murNEn4OWnzMdh0Wd-gsK-G7m/pub" data-title="Materias Optativas">
+            <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+            Materias Optativas
+          </div>
+          <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vTTSzbJ-jWw1J78AlABDVX0oIV1H8LGrYFBlf8piEQuEIV_pES0JcNASVmXmlrsGDiZMYAT1a30cBFT/pub" data-title="Definición de Trabajo Final">
+            <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+            Definición de Trabajo Final
+          </div>
+          <div class="doc-item" data-pdf="https://docs.google.com/document/d/e/2PACX-1vR0qV4cT7AURNN8RuWe-ciGodtwYyhcCVAK_XsWs_nEB42UfQdrK1XepaNvVDx0EdnHfbZXSJVOcNSs/pub" data-title="Info Trabajo Final">
+            <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+            Info Trabajo Final
+          </div>
+          <div class="doc-item" data-pdf="https://drive.google.com/file/d/1uzXcYIoUF06HgtIwZAvskYXov9Y3gFW4/preview" data-title="Instructivo para alumnos de maestría">
+            <img src="https://img.icons8.com/color/48/000000/pdf.png" alt="PDF icon" />
+            Instructivo para alumnos de maestría
+          </div>
+        </div>
+      </section>
+        <hr class="separator"></hr>      
+      <button class="ayuda-btn" onclick="generar()" type="submit">Generar certificado alumno regular</button>      <section>
+      <div class="modal-bg" id="pdfModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+      <div class="modal-content2">
+        <div class="modal-header">
+          <span id="modalTitle">Título PDF</span>
+          <button class="modal-close" aria-label="Cerrar modal">&times;</button>
+        </div>
+          <div class="modal-body">
+          <iframe src="" id="modalPdfEmbed" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        
+      </div>
+    </div>
+    </div>
+
+
+
+  
   </main>
   
 
@@ -491,7 +589,94 @@ setTimeout(() => {
 
     });
 
+function sidebar(menu) {
+
+  document.querySelectorAll(".perfil, .notas, .cursos, .ayuda, .carreras").forEach(element => {
+    element.style.display = "none";
+  });
+
+  switch (menu) {
+    case "Perfil":
+      document.querySelectorAll(".perfil").forEach(element => {
+        element.style.display = "block";
+      });
+      document.getElementById("section-header").textContent = menu
+      break;
+    case "Notas":
+      document.querySelectorAll(".notas").forEach(element => {
+        element.style.display = "block";
+      });
+      document.getElementById("section-header").textContent = menu
+
+      break;
+    case "Cursos":
+      document.querySelectorAll(".cursos").forEach(element => {
+        element.style.display = "block";
+      });
+      document.getElementById("section-header").textContent = menu
+
+      break;
+    case "Ayuda":
+      document.querySelectorAll(".ayuda").forEach(element => {
+        element.style.display = "block";
+      });
+      document.getElementById("section-header").textContent = menu
+
+      break;
+    case "Carreras":
+      document.querySelectorAll(".carreras").forEach(element => {
+        element.style.display = "block";
+      });
+      document.getElementById("section-header").textContent = menu
+
+      break;
+    default:
+      break;
+  }
+}
+
 
 </script>
+
+   <script>
+
+
+    const docItems = document.querySelectorAll('.doc-item');
+    const modal = document.getElementById('pdfModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPdfEmbed = document.getElementById('modalPdfEmbed');
+    const modalCloseBtn = modal.querySelector('.modal-close');
+
+    docItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const pdfSrc = item.getAttribute('data-pdf');
+        const title = item.getAttribute('data-title');
+        modalTitle.textContent = title;
+        modalPdfEmbed.setAttribute('src', pdfSrc);
+        modal.classList.add('active');
+        modal.focus();
+    });
+    });
+
+    modalCloseBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    modalPdfEmbed.setAttribute('src', '');
+    });
+
+    modal.addEventListener('click', e => {
+    if (e.target === modal) {
+        modal.classList.remove('active');
+        modalPdfEmbed.setAttribute('src', '');
+    }
+    });
+
+    document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+        modal.classList.remove('active');
+        modalPdfEmbed.setAttribute('src', '');
+    }
+    });
+
+    </script>
 </body>
 </html>
