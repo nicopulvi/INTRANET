@@ -38,7 +38,7 @@
 
 .navbar img {
   height: 30px;
-  width: 30px;
+  width: 26px;
 }
 
 #navb {
@@ -289,9 +289,8 @@ body {
     position: absolute;
     top: 0px;
     height: 100%; 
-    left: 0;
+    left: 0%;
     width: 100%;
-    height: calc(100% - 60px);
     background: white;
     display: flex;
     align-items: center;
