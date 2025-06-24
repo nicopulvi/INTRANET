@@ -38,7 +38,7 @@
 
 .navbar img {
   height: 30px;
-  width: 26px;
+  width: 28px;
 }
 
 #navb {
@@ -349,4 +349,9 @@ body {
   padding: 0px 1.5rem;
 
   letter-spacing: 1px;
+}
+
+.notif-fadeout {
+  opacity: 0;
+  transition: opacity 0.4s;
 }

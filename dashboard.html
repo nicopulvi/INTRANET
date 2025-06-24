@@ -13,6 +13,17 @@
 
     const supabase = createClient(url, len);
 
+    // Detectar tokens en la URL
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+
+    if (access_token && refresh_token) {
+      await supabase.auth.setSession({ access_token, refresh_token });
+
+      // Limpiar la URL
+      history.replaceState(null, "", window.location.pathname);
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
@@ -81,7 +92,7 @@
           .filter(Boolean);
 
         if (aplazosGraves.length > 0) {
-          notificaciones.push(`Tenes con 3 o más aplazos: ${aplazosGraves.join(', ')}`);
+          notificaciones.push(`Tenes 3 o más aplazos: ${aplazosGraves.join(', ')}`);
         }
 
         // Deudor
@@ -121,8 +132,9 @@
 
         document.querySelector('main').prepend(notifBox);
         document.querySelector('#closeNotifBtn').addEventListener('click', () => {
-  notifBox.remove();
-});
+          notifBox.classList.add('notif-fadeout');
+          setTimeout(() => notifBox.remove(), 400); 
+        });
 
         }
       }
