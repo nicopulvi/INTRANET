@@ -67,7 +67,7 @@
         const { data, error } = await supabaseAdmin.auth.admin.generateLink({
           type: "magiclink",
           email: row.email,
-          options: { redirectTo: window.location.origin + "/dashboard.html" }
+          options: { redirectTo: window.location.origin + "/INTRANET" + "/dashboard.html" }
         });
 
         if (error) {
@@ -78,8 +78,7 @@
         // 3) Mostrar el link
         const link = data.properties?.action_link || data.action_link;
         document.getElementById("magic-link-container").innerHTML = `
-          <p>Entra sin contraseña:</p>
-          <a href="${link}" class="btn" target="_blank">Acceso mágico →</a>
+          <center><a href="${link}" class="btn" target="_blank">ENTRAR CON ADMIN LINK →</a></center>
         `;
         return;
       }
