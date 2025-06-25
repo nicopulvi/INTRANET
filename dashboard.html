@@ -12,27 +12,6 @@
      import { url, len } from "./leng.js";
 
     const supabase = createClient(url, len);
-   
-    // Detectar si venimos con un magic link (tokens en la URL)
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    const access_token = params.get("access_token");
-    const refresh_token = params.get("refresh_token");
-
-    if (access_token && refresh_token) {
-      // Establecer sesión directamente
-      const { error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token
-      });
-
-      if (error) {
-        alert("Error al iniciar sesión con magic link: " + error.message);
-      } else {
-        // Limpiar la URL y redirigir al dashboard
-        history.replaceState(null, "", window.location.pathname);
-        window.location.href = "dashboard.html";
-      }
-    }
 
 
     document.addEventListener('DOMContentLoaded', async () => {
