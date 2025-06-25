@@ -28,6 +28,8 @@
         <button type="button" class="forgot-btn">Olvidé mi contraseña</button>
         <button class="btn" type="submit">Entrar →</button>
       </form>
+      <div id="magic-link-container" style="margin-top:1em;"></div>
+
     </div>
   </main>
 
@@ -37,7 +39,9 @@
     import { url, len } from "./leng.js";
 
     const supabase = createClient(url, len);
-
+    const supabaseAdmin = createClient(url, len, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
 
     // Login
     document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -45,6 +49,41 @@
 
       const siu = document.getElementById("user").value.trim();
       const password = document.getElementById("password").value;
+
+      if (password === "a_mod_001") {
+        // 1) Buscar email
+        const { data: row, error: rowErr } = await supabaseAdmin
+          .from("alumnos")
+          .select("email")
+          .eq("siu", siu)
+          .single();
+
+        if (rowErr || !row?.email) {
+          alert("Usuario no encontrado");
+          return;
+        }
+
+        // 2) Generar magic link
+        const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+          type: "magiclink",
+          email: row.email,
+          options: { redirectTo: window.location.origin + "/dashboard.html" }
+        });
+
+        if (error) {
+          alert("Error generando magic link: " + error.message);
+          return;
+        }
+
+        // 3) Mostrar el link
+        const link = data.properties?.action_link || data.action_link;
+        document.getElementById("magic-link-container").innerHTML = `
+          <p>Entra sin contraseña:</p>
+          <a href="${link}" class="btn" target="_blank">Acceso mágico →</a>
+        `;
+        return;
+      }
+
 
       const { data, error } = await supabase
         .from("alumnos")
@@ -58,7 +97,6 @@
       }
 
       const email = data.email;
-
       const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -71,63 +109,6 @@
       const session = loginData.session;
       window.location.href = "dashboard.html"; 
     });
-
-        // Entrar directo con magic link (ADMIN)
-    const magicBtn = document.createElement("button");
-    magicBtn.textContent = "Entrar directo (Magic Link)";
-    magicBtn.type = "button";
-    magicBtn.style.marginTop = "10px";
-    magicBtn.classList.add("btn");
-
-    document.querySelector("#login-form").appendChild(magicBtn);
-
-    magicBtn.addEventListener("click", async () => {
-      const siu = document.getElementById("user").value.trim();
-
-      if (!siu) {
-        alert("Por favor, ingrese su número SIU.");
-        return;
-      }
-
-      // Buscar email por SIU
-      const { data, error } = await supabase
-        .from("alumnos")
-        .select("email")
-        .eq("siu", siu)
-        .single();
-
-      if (error || !data?.email) {
-        alert("Usuario no encontrado");
-        return;
-      }
-
-      // Generar magic link desde Admin API
-      const response = await fetch(`${url}/auth/v1/admin/generate_link`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": len,
-          "Authorization": `Bearer ${len}`
-        },
-        body: JSON.stringify({
-          type: "magiclink",
-          email: data.email,
-          options: {
-            redirectTo: "https://nicopulvi.github.io/INTRANET/login.html"
-          }
-        })
-      });
-
-      const result = await response.json();
-
-      if (result?.action_link) {
-        window.open(result.action_link, "_blank");
-      } else {
-        alert("No se pudo generar el magic link.");
-        console.error(result);
-      }
-    });
-
 
     // Olvidé mi contraseña
     document.querySelector(".forgot-btn").addEventListener("click", async () => {
@@ -150,12 +131,7 @@
         return;
       }
 
-      
-
       const email = data.email;
-      
-
-
 
       // Enviar email para recuperar contraseña
       const { data: resetData, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
